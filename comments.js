@@ -1,36 +1,42 @@
 const commentForm = document.getElementById('comment-form');
 const commentList = document.getElementById('comment-list');
 
+// Заменить массив комментариев локальным хранилищем
+const COMMENT_KEY = 'comments';
+let comments = JSON.parse(localStorage.getItem(COMMENT_KEY)) || [];
+
+function saveComments() {
+  localStorage.setItem(COMMENT_KEY, JSON.stringify(comments));
+}
+
+function displayComments() {
+  commentList.innerHTML = '';
+  for (const comment of comments) {
+    const commentElement = document.createElement('li');
+    commentElement.innerHTML = `
+      <span class="name">${comment.name}</span>
+      <p class="comment">${comment.comment}</p>
+    `;
+    commentList.appendChild(commentElement);
+  }
+}
+
 commentForm.addEventListener('submit', (event) => {
   event.preventDefault();
 
   const name = document.getElementById('name').value;
   const comment = document.getElementById('comment').value;
 
-  // Сохранить комментарий в локальном хранилище
-  const comments = JSON.parse(localStorage.getItem('comments')) || [];
+  // Добавить новый комментарий и сохранить
   comments.push({ name, comment });
-  localStorage.setItem('comments', JSON.stringify(comments));
+  saveComments();
 
-  // Отобразить комментарий
-  const commentElement = document.createElement('li');
-  commentElement.innerHTML = `
-    <span class="name">${name}</span>
-    <p class="comment">${comment}</p>
-  `;
-  commentList.appendChild(commentElement);
+  // Отображать обновленные комментарии
+  displayComments();
 
   // Очистить форму
   commentForm.reset();
 });
 
-// Загрузить комментарии из локального хранилища
-const comments = JSON.parse(localStorage.getItem('comments')) || [];
-for (const comment of comments) {
-  const commentElement = document.createElement('li');
-  commentElement.innerHTML = `
-    <span class="name">${comment.name}</span>
-    <p class="comment">${comment.comment}</p>
-  `;
-  commentList.appendChild(commentElement);
-}
+// Загрузка и отображение комментариев initially
+displayComments();
